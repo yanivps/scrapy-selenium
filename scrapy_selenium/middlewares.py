@@ -1,6 +1,7 @@
 """This module contains the ``SeleniumMiddleware`` scrapy middleware"""
 
 from importlib import import_module
+import undetected_chromedriver.v2 as uc
 
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
@@ -31,13 +32,15 @@ class SeleniumMiddleware:
             Selenium remote server endpoint
         """
 
-        webdriver_base_path = f'selenium.webdriver.{driver_name}'
+        # webdriver_base_path = f'selenium.webdriver.{driver_name}'
 
-        driver_klass_module = import_module(f'{webdriver_base_path}.webdriver')
-        driver_klass = getattr(driver_klass_module, 'WebDriver')
+        # driver_klass_module = import_module(f'{webdriver_base_path}.webdriver')
+        # driver_klass = getattr(driver_klass_module, 'WebDriver')
+        driver_klass = uc.Chrome
 
-        driver_options_module = import_module(f'{webdriver_base_path}.options')
-        driver_options_klass = getattr(driver_options_module, 'Options')
+        # driver_options_module = import_module(f'{webdriver_base_path}.options')
+        # driver_options_klass = getattr(driver_options_module, 'Options')
+        driver_options_klass = uc.ChromeOptions
 
         driver_options = driver_options_klass()
 
@@ -48,22 +51,23 @@ class SeleniumMiddleware:
 
         driver_kwargs = {
             'executable_path': driver_executable_path,
-            f'{driver_name}_options': driver_options
+            'options': driver_options
         }
+        self.driver = driver_klass(**driver_kwargs)
 
-        # locally installed driver
-        if driver_executable_path is not None:
-            driver_kwargs = {
-                'executable_path': driver_executable_path,
-                f'{driver_name}_options': driver_options
-            }
-            self.driver = driver_klass(**driver_kwargs)
-        # remote driver
-        elif command_executor is not None:
-            from selenium import webdriver
-            capabilities = driver_options.to_capabilities()
-            self.driver = webdriver.Remote(command_executor=command_executor,
-                                           desired_capabilities=capabilities)
+        # # locally installed driver
+        # if driver_executable_path is not None:
+        #     driver_kwargs = {
+        #         'executable_path': driver_executable_path,
+        #         'options': driver_options
+        #     }
+        #     self.driver = driver_klass(**driver_kwargs)
+        # # remote driver
+        # elif command_executor is not None:
+        #     from selenium import webdriver
+        #     capabilities = driver_options.to_capabilities()
+        #     self.driver = webdriver.Remote(command_executor=command_executor,
+        #                                    desired_capabilities=capabilities)
 
     @classmethod
     def from_crawler(cls, crawler):
