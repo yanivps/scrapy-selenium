@@ -104,6 +104,8 @@ class SeleniumMiddleware:
         if not isinstance(request, SeleniumRequest):
             return None
 
+        if hasattr(spider, "user_agent"):
+            self.driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": spider.user_agent})
         self.driver.get(request.url)
 
         for cookie_name, cookie_value in request.cookies.items():
