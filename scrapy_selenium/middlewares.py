@@ -54,6 +54,8 @@ class SeleniumMiddleware:
             'options': driver_options
         }
         self.driver = driver_klass(**driver_kwargs)
+        self.driver.set_window_size(1024, 600)
+        self.driver.maximize_window()
 
         # # locally installed driver
         # if driver_executable_path is not None:
