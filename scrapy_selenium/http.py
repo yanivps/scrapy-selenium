@@ -30,3 +30,11 @@ class SeleniumRequest(Request):
         self.script = script
 
         super().__init__(*args, **kwargs)
+
+    def copy(self) -> "Request":
+        request_copy: SeleniumRequest = super().copy()
+        request_copy.wait_time = self.wait_time
+        request_copy.wait_until = self.wait_until
+        request_copy.screenshot = self.screenshot
+        request_copy.script = self.script
+        return request_copy
